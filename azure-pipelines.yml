@@ -1,0 +1,27 @@
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: sdk
+    version: 9.0.x
+
+- script: dotnet restore
+  displayName: Restore
+
+- script: dotnet build --configuration Release --no-restore
+  displayName: Build
+
+
+# Creates a deployable artifact (zip/folder)
+- script: dotnet publish -c Release -o $(Build.ArtifactStagingDirectory)
+  displayName: Publish
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: $(Build.ArtifactStagingDirectory)
+    ArtifactName: drop
